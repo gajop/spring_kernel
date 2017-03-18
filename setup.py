@@ -7,7 +7,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(path.join(here, 'README'), encoding='utf-8') as f:
     long_description = f.read()
 
 PKGNAME = 'spring_kernel'
@@ -59,11 +59,11 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    #packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    packages=[PKGNAME],
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    #packages=[PKGNAME],
 
     package_data = {
-        PKGNAME : [ 'resources/logo-*x*.png', 'kernel_config.json' ] 
+        PKGNAME : [ 'resources/logo-*x*.png', 'kernel_config.json' ]
     },
 
     install_requires=[ "setuptools",
