@@ -9,7 +9,14 @@ import logging
 LOG = None
 
 # Default wrapping class for an output message
-HTML_DIV_CLASS = 'krn-bot'
+HTML_DIV_CLASS = 'spring-kernel'
+
+classMapping = {
+    'error' : 'bg-danger',
+    'warning' : 'bg-warning',
+    'help'  : 'bg-info',
+    'state-info' : 'text-muted',
+}
 
 
 # ----------------------------------------------------------------
@@ -73,12 +80,13 @@ def div( txt, *args, **kwargs ):
     if args:
         txt = txt.format( *args )
     css = kwargs.get('css',HTML_DIV_CLASS)
+    css = classMapping.get(css) or css
     return u'<div class="{}">{!s}</div>'.format( css, txt )
 
 
-def data_msglist( msglist ):
+def data_msg(msglist):
     """
-    Return a Jupyter display_data message, in both HTML & text formats, by 
+    Return a Jupyter display_data message, in both HTML & text formats, by
     joining together all passed messages.
 
       @param msglist (iterable): an iterable containing a list of tuples
@@ -92,55 +100,9 @@ def data_msglist( msglist ):
     for msg, css in msglist:
         if is_collection(msg):
             msg = msg[0].format(*msg[1:])
-        html += div( escape(msg).replace('\n','<br/>'), css=css or 'msg' )
+        msg = escape(msg).replace('\n','<br/>')
+        html += div(msg, css=css or 'msg' )
         txt += msg + "\n"
     return { 'data': {'text/html' : div(html),
                       'text/plain' : txt },
              'metadata' : {} }
-
-
-def data_msg( msg, mtype=None ):
-    """
-    Return a Jupyter display_data message, in both HTML & text formats, by 
-    formatting a given single message.
-      @param msg (str,list): a string, or a list of format string + args,
-        or an iterable of (msg,mtype)
-      @param mstype (str): the message type (used for the CSS class). If
-        it's \c __MULTI__, then \c msg will be treated as a multi-message
-    """
-    if isinstance(msg,KrnlException):
-        return msg() # a KrnlException knows how to format itself
-    elif mtype == '_MULTI_':
-        return data_msglist( msg )
-    else:
-        return data_msglist( [ (msg, mtype) ] )
-
-
-
-# ----------------------------------------------------------------------
-
-class KrnlException( Exception ):
-    """
-    An exception for kernel errors. Will generate a Jupyter message
-    to be sent to the frontend
-    """
-    def __init__(self, msg, *args):
-        if isinstance(msg,Exception):
-            msg = repr( msg )
-        elif len(msg):
-            msg = msg.format(*args)
-        getLogger().warn( "KrnlException: %s", msg, exc_info=1 )
-        super(KrnlException,self).__init__(msg)
-
-    def __call__(self):
-        """
-        When called as a function, it generates a Jupyter display data message
-        """
-        msg = escape(self.args[0]).replace('\n','<br/>')
-        html = div( div(u'<span class="title">Error:</span> '+msg, css="error") )
-        return { 'data': {'text/html' : html,
-                          'text/plain' : 'Error: ' + self.args[0] },
-                 'metadata' : {} }
-
-
-

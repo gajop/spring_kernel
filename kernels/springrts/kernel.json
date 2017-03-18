@@ -2,5 +2,5 @@
  "argv": ["/home/gajop/radni_direktorijum/programi/spring-kernel/env/bin/python2", "kernel.py",
           "-f", "{connection_file}"],
  "display_name": "SpringRTS",
- "language": "python"
+ "language": "Lua"
 }

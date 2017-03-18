@@ -7,12 +7,14 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-#with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    #long_description = f.read()
-long_description = ""
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
+PKGNAME = 'spring_kernel'
+pkg = __import__( PKGNAME )
 
 setup(
-    name='spring-kernel',
+    name=PKGNAME,
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -34,21 +36,12 @@ setup(
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        # How mature is this project? Common values are
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
         'Development Status :: 3 - Alpha',
-
-        # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
-
-        # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
+        'Framework :: IPython',
+        'Development Status :: 4 - Beta',
 
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
@@ -58,10 +51,22 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='springrts jupyter',
+    keywords='springrts jupyter ipython',
+
+    entry_points = { 'console_scripts': [
+        'jupyter-springrtskernel = spring_kernel.__main__:main',
+    ]},
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     #packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    packages='jupyter',
+    packages=[PKGNAME],
+
+    package_data = {
+        PKGNAME : [ 'resources/logo-*x*.png', 'kernel_config.json' ] 
+    },
+
+    install_requires=[ "setuptools",
+                   "ipykernel >= 4.0",
+                   "jupyter-client >= 4.0"],
 )
