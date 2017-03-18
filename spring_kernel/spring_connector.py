@@ -6,7 +6,8 @@ import threading
 import Queue
 
 CONFIG_FILE = "kernel-config.json"
-config = json.load(open(CONFIG_FILE, "r"))
+CONFIG_FILE_PATH = os.path.join(os.path.realpath(__file__), CONFIG_FILE)
+config = json.load(open(CONFIG_FILE_PATH, "r"))
 
 HOST = config["host"]              # Symbolic name meaning all available interfaces
 PORT = config["port"]              # Arbitrary non-privileged port
