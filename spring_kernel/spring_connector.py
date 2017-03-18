@@ -1,12 +1,13 @@
 from __future__ import print_function
 import socket
 import json
+import os
 import logging
 import threading
 import Queue
 
 CONFIG_FILE = "kernel-config.json"
-CONFIG_FILE_PATH = os.path.join(os.path.realpath(__file__), CONFIG_FILE)
+CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), CONFIG_FILE)
 config = json.load(open(CONFIG_FILE_PATH, "r"))
 
 HOST = config["host"]              # Symbolic name meaning all available interfaces
