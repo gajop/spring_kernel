@@ -54,7 +54,7 @@ setup(
     keywords='springrts jupyter ipython',
 
     entry_points = { 'console_scripts': [
-        'jupyter-springrtskernel = spring_kernel.__main__:main',
+        'jupyter-spring_kernel = spring_kernel.__main__:main',
     ]},
 
     # You can just specify the packages manually here if your project is
@@ -63,10 +63,11 @@ setup(
     #packages=[PKGNAME],
 
     package_data = {
-        PKGNAME : [ 'resources/logo-*x*.png', 'kernel_config.json' ]
+        PKGNAME : [ 'resources/logo-*x*.png', 'kernel-config.json' ]
     },
 
     install_requires=[ "setuptools",
                    "ipykernel >= 4.0",
-                   "jupyter-client >= 4.0"],
+                   "jupyter-client >= 4.0",
+                   "jupyter"],
 )
