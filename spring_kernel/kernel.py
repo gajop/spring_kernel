@@ -17,7 +17,7 @@ magics = {
     '%uluarules' : [ 'LuaRules Unsynced', 'execute code in unsynced LuaRules state'],
     '%sluarules' : [ 'LuaRules Synced', 'execute code in synced LuaRules state'],
     '_p' : [ '', 'Lua helper function to print data to the notebook'],
-    '_s' : [ '', 'Lua helper function to get source code preview of a function'],
+    '_s' : [ '', 'Lua helper function to print the function source code'],
 }
 
 
