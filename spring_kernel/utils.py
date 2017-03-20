@@ -16,6 +16,7 @@ classMapping = {
     'warning' : 'bg-warning',
     'help'  : 'bg-info',
     'state-info' : 'text-muted',
+# <div class="output"> gets converted to <pre>
 }
 
 
@@ -81,7 +82,10 @@ def div( txt, *args, **kwargs ):
         txt = txt.format( *args )
     css = kwargs.get('css',HTML_DIV_CLASS)
     css = classMapping.get(css) or css
-    return u'<div class="{}">{!s}</div>'.format( css, txt )
+    tag = "div"
+    if css == "output":
+        tag = "pre"
+    return (u'<' + tag + ' class="{}">{!s}</' + tag + '>').format( css, txt )
 
 
 def data_msg(msglist):
