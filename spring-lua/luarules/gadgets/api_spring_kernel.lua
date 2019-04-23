@@ -1,15 +1,14 @@
 VFS.Include(KERNEL_FOLDER .. "kernel_utils.lua")
 
 function gadget:GetInfo()
-return {
-	name    = "Spring kernel gadget",
-	desc    = "Spring kernel gadget executor (synced and unsynced)",
-	author  = "gajop",
-	date    = "after steam release",
-	license = "GNU GPL, v2 or later",
-	layer   = -10010,
-	enabled = true,
-}
+	return {
+		name    = "Spring kernel gadget",
+		desc    = "Spring kernel gadget executor (synced and unsynced)",
+		author  = "gajop",
+		license = "MIT",
+		layer   = -10010,
+		enabled = true,
+	}
 end
 
 -- SYNCED
@@ -19,7 +18,7 @@ function gadget:Initialize()
 	-- Only use this in development versions
 	if not Game.gameVersion:find("$VERSION") then
 		Spring.Log(__SK.LOG_SECTION, LOG.NOTICE, "Removing kernel for non-development version.")
-	    gadgetHandler:RemoveWidget(self)
+	    gadgetHandler:RemoveGadget(self)
 		return
 	end
 end
@@ -38,6 +37,17 @@ function __SK.ExecuteLua(args)
 	end
 end
 
+function __SK.Autocomplete(args)
+	msg = {}
+	if args.state == "sluarules" then
+		local matches = __SK.autocomplete(args.code)
+		table.insert(msg, {"matches", matches})
+		SendToUnsynced("kernelSendToUnsynced", __SK.json.encode(msg))
+	elseif args.state == "uluarules" then
+		SendToUnsynced("kernelAutocompleteUnsynced", __SK.json.encode(args))
+	end
+end
+
 function gadget:RecvLuaMsg(msg)
 	local msg_table = __SK.explode('|', msg)
 	if msg_table[1] == "spring_kernel_ex" then
@@ -48,6 +58,14 @@ function gadget:RecvLuaMsg(msg)
 			return
 		end
 		__SK.ExecuteLua(obj)
+	elseif msg_table[1] == "spring_kernel_autocomplete" then
+		local success, obj = pcall(__SK.json.decode, msg_table[2])
+		if not success then
+			Spring.Log(__SK.LOG_SECTION, LOG.ERROR, "Failed to parse JSON: " .. tostring(msg_table[2]))
+			Spring.Log(__SK.LOG_SECTION, LOG.ERROR, debug.traceback())
+			return
+		end
+		__SK.Autocomplete(obj)
 	end
 end
 
@@ -77,15 +95,30 @@ function __SK.ExecuteInUnsynced(_, data)
 	__SK.UnsyncedToWidget(nil, __SK.json.encode(msg))
 end
 
+function __SK.AutocompleteInUnsynced(_, data)
+	local success, obj = pcall(__SK.json.decode, data)
+	if not success then
+		Spring.Log(__SK.LOG_SECTION, LOG.ERROR, "Failed to parse JSON: " .. tostring(data))
+		Spring.Log(__SK.LOG_SECTION, LOG.ERROR, debug.traceback())
+		return
+	end
+
+	local matches = __SK.autocomplete(args.code)
+	table.insert(msg, {"matches", matches})
+	local msg = {}
+	__SK.UnsyncedToWidget(nil, __SK.json.encode(msg))
+end
+
 function gadget:Initialize()
 	-- Only use this in development versions
 	if not Game.gameVersion:find("$VERSION") then
 		Spring.Log(__SK.LOG_SECTION, LOG.NOTICE, "Removing kernel for non-development version.")
-	    gadgetHandler:RemoveWidget(self)
+	    gadgetHandler:RemoveGadget(self)
 		return
 	end
 
 	gadgetHandler:AddSyncAction('kernelExecuteUnsynced', __SK.ExecuteInUnsynced)
+	gadgetHandler:AddSyncAction('kernelAutocompleteUnsynced', __SK.AutocompleteInUnsynced)
 	gadgetHandler:AddSyncAction('kernelSendToUnsynced', __SK.UnsyncedToWidget)
 end
 
